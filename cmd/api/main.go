@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Siddharth9101/olx-api/internal/config"
+	"github.com/Siddharth9101/olx-api/internal/handlers"
 )
 
 func main() {
@@ -14,12 +15,8 @@ func main() {
 	// initializing new router/mux
 	mux := http.NewServeMux();
 
-	// defining health endpoint
-	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"status": "ok"}`))
-	})
+	// health endpoint
+	mux.HandleFunc("GET /healthz", handlers.Healthz)
 
 	// initializing new server
 	srv := http.Server{
