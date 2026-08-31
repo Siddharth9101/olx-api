@@ -23,10 +23,12 @@ func main() {
 	// initializing new router/mux
 	mux := http.NewServeMux();
 
+	lh := handlers.NewListingHandler(db)
+
 	// api endpoints
 	mux.HandleFunc("GET /healthz", handlers.Health)
-	mux.HandleFunc("GET /listings", handlers.Listing(db))
-	mux.HandleFunc("DELETE /listings/{id}", handlers.DeleteListing(db))
+	mux.HandleFunc("GET /listings", lh.List)
+	mux.HandleFunc("DELETE /listings/{id}", lh.Delete)
 
 	// initializing new server
 	srv := http.Server{
