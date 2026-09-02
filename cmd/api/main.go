@@ -10,6 +10,7 @@ import (
 	"github.com/Siddharth9101/olx-api/internal/config"
 	"github.com/Siddharth9101/olx-api/internal/db"
 	"github.com/Siddharth9101/olx-api/internal/handlers"
+	"github.com/Siddharth9101/olx-api/internal/middlewares"
 )
 
 func main() {
@@ -33,6 +34,9 @@ func main() {
 	// initializing new router/mux
 	mux := http.NewServeMux();
 
+	// global middleare
+	handler := middlewares.RequestId(mux)
+
 	lh := handlers.NewListingHandler(db, logger)
 
 	// api endpoints
@@ -43,7 +47,7 @@ func main() {
 	// initializing new server
 	srv := http.Server{
 		Addr: ":"+ cfg.Port,
-		Handler: mux,
+		Handler: handler, // global mw
 		ReadTimeout: time.Second * 10,
 		WriteTimeout: time.Second * 30,
 		IdleTimeout: time.Second * 60,
