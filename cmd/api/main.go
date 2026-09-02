@@ -2,7 +2,9 @@ package main
 
 import (
 	"log"
+	"log/slog"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/Siddharth9101/olx-api/internal/config"
@@ -20,10 +22,18 @@ func main() {
 		log.Fatalf("main.db.connect: %v", err)
 	}
 
+	// logger
+	logHandler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		AddSource: true,
+		Level: slog.LevelInfo,
+	})
+	logger := slog.New(logHandler)
+	slog.SetDefault(logger)
+
 	// initializing new router/mux
 	mux := http.NewServeMux();
 
-	lh := handlers.NewListingHandler(db)
+	lh := handlers.NewListingHandler(db, logger)
 
 	// api endpoints
 	mux.HandleFunc("GET /healthz", handlers.Health)
