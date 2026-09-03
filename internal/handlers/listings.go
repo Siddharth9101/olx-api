@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Siddharth9101/olx-api/internal/httpx"
 	"github.com/Siddharth9101/olx-api/internal/middlewares"
 )
 
@@ -41,7 +42,7 @@ func (lh ListingHandler) List(w http.ResponseWriter, r *http.Request){
 		LIMIT 100`)
 	if err != nil {
 		lh.logger.Error("listing query error", "request_id", requestId, "err", err)
-		http.Error(w, "internal error", http.StatusInternalServerError)
+		httpx.Error(w, http.StatusInternalServerError, "something went wrong", httpx.CodeInternalError)
 		return
 	}
 	defer rows.Close()
@@ -51,7 +52,7 @@ func (lh ListingHandler) List(w http.ResponseWriter, r *http.Request){
 		var l listing
 		if err := rows.Scan(&l.ID, &l.Title, &l.Description, &l.Price, &l.City, &l.CreatedAt); err != nil {
 			lh.logger.Error("listing rows scan error", "request_id", requestId, "err", err)
-			http.Error(w, "internal error", http.StatusInternalServerError)
+			httpx.Error(w, http.StatusInternalServerError, "something went wrong", httpx.CodeInternalError)
 			return
 		}
 		listings = append(listings, l)
@@ -59,7 +60,7 @@ func (lh ListingHandler) List(w http.ResponseWriter, r *http.Request){
 
 	if err := rows.Err(); err != nil {
 		lh.logger.Error("listing rows error", "request_id", requestId, "err", err)
-		http.Error(w, "internal error", http.StatusInternalServerError)
+		httpx.Error(w, http.StatusInternalServerError, "something went wrong", httpx.CodeInternalError)
 		return
 	}
 
@@ -78,10 +79,10 @@ func (lh ListingHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 	_, err := lh.db.ExecContext(ctx, `DELETE FROM listing WHERE id = $1`, id)
 	if err != nil {
-		lh.logger.Error("listings delete error", "request_id", requestId, "listing_id", id, "err", err)
-		http.Error(w, "internal error", http.StatusInternalServerError)
+		lh.logger.Error("listing delete error", "request_id", requestId, "listing_id", id, "err", err)
+		httpx.Error(w, http.StatusInternalServerError, "something went wrong", httpx.CodeInternalError)
 		return
-	}
+	} 
 
 	lh.logger.Info("listing deleted successfully", "request_id", requestId, "listing_id", id)
 
