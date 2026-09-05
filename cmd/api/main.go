@@ -43,6 +43,7 @@ func main() {
 	mux.HandleFunc("GET /healthz", handlers.Health)
 	mux.HandleFunc("GET /listings", lh.List)
 	mux.HandleFunc("DELETE /listings/{id}", lh.Delete)
+	mux.HandleFunc("POST /listings", lh.Create)
 
 	// initializing new server
 	srv := http.Server{
