@@ -1,6 +1,10 @@
 package handlers
 
-import "time"
+import (
+	"fmt"
+	"strings"
+	"time"
+)
 
 type CreateListingRequest struct {
 	Title       string `json:"title"`
@@ -13,4 +17,35 @@ type CreateListingResponse struct {
 	ID        string    `json:"id"`
 	Title     string    `json:"title"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+type ValidationError struct {
+	Field string 
+	Msg string
+}
+
+func (e *ValidationError) Error() string {
+	return fmt.Sprintf("%s: %s", e.Field, e.Msg)
+}
+
+func (req CreateListingRequest) Validate() error {
+	if strings.TrimSpace(req.Title) == "" {
+		return &ValidationError{Field: "title", Msg: "must not be empty"}
+	}
+	if len(strings.TrimSpace(req.Title))<3 {
+		return &ValidationError{Field: "title", Msg: "must be more than 3 characters"}
+	}
+	if strings.TrimSpace(req.Description) == "" {
+		return &ValidationError{Field: "description", Msg: "must not be empty"}
+	}
+	if len(strings.TrimSpace(req.Description))<3 {
+		return &ValidationError{Field: "description", Msg: "must be more than 10 characters"}
+	}
+	if req.Price < 100 {
+		return &ValidationError{Field: "price", Msg: "must be more than 100 paise"}
+	}
+	if strings.TrimSpace(req.City) == "" {
+		return &ValidationError{Field: "city", Msg: "must not be empty"}
+	}
+	return nil
 }
